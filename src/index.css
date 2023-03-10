@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.text-ellipsis--2{
+    text-overflow:ellipsis;
+    overflow:hidden;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+  }
+
+*{
+  font-family: 'Signika', sans-serif;
+}
+
+.font{
+  font-family: 'Signika', sans-serif;
+  font-weight: 200;
+}
+
+/* Loaders */
+
+.loader-list {
+
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.loader-list li {
+  list-style: none;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+  animation: ani 1.6s ease-in-out infinite;
+}
+
+@keyframes ani {
+
+  0%,
+  40%,
+  100% {
+    transform: scale(0.2);
+  }
+
+  20% {
+    transform: scale(0.6);
+  }
+
+}
+
+.dot-1 {
+  animation-delay: -1.4s !important;
+  background: #ffff00;
+  box-shadow: 0 0 50px #ffff00;
+
+}
+
+.dot-2 {
+  animation-delay: -1.2s !important;
+  background: #76ff03;
+  box-shadow: 0 0 50px #76ff03;
+}
+
+.dot-3 {
+  animation-delay: -1s !important;
+  background: #f06292;
+  box-shadow: 0 0 50px #f06292;
+}
+
+.dot-4 {
+  animation-delay: -0.8s !important;
+  background: #4fc3f7;
+  box-shadow: 0 0 50px #4fc3f7;
+}
