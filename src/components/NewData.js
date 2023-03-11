@@ -34,6 +34,7 @@ const NewRecords = () => {
                     signer
                 )
                 const records = await contract.getAllRecords();
+                // console.log(records)
                 let recordsClean = [];
                 records.forEach((record) => {
                     recordsClean.push({
