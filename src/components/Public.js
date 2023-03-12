@@ -1,25 +1,19 @@
 import React, { useEffect, useState } from 'react'
-import record from '../assets/record.jpg'
-import { Link } from 'react-router-dom';
-import { useContract, useSigner } from 'wagmi';
-import { useStateContext } from '../context';
+import { useStateContext } from '../context'
+import Loading from './Loading'
 import { ethers } from 'ethers';
-import Loading from './Loading';
+import { Link } from 'react-router-dom';
 
-const NewRecords = () => {
+
+function Public() {
+    const [isLoading, setIsLoading] = useState()
     const [recordsArray, setRecordsArray] = useState([]);
-    const [ownersArray, setOwnersArray] = useState([]);
     const { address, contractAddress, contractABI  } = useStateContext();
-    const [newAddress, setNewAddress] = useState();
-    const [isLoading, setIsLoading] = useState(false);
-
     useEffect(() => {
         setIsLoading(true);
         getAllRecords();
         setIsLoading(false);
     }, [])
-
-
 
     const getAllRecords = async () => {
         try {
@@ -53,22 +47,7 @@ const NewRecords = () => {
                         recordsNew.push(recordsClean[i])
                     }
                 }
-
                 setRecordsArray(recordsNew);
-                let recordOwners = []
-                for (let i = 0; i < records.length; i++) {
-                    if (records[i].title !== "") {
-                        recordOwners.push(records[i]);
-                    }
-                }
-
-                let owners = [];
-                for (let i = 0; i < recordOwners[0].owners.length; i++) {
-                    owners.push(recordOwners[0].owners[i]);
-                }
-
-
-                setOwnersArray(owners);
                 setIsLoading(false)
             } else {
                 console.log("ethreuem object not found")
@@ -82,56 +61,6 @@ const NewRecords = () => {
 
     }
 
-    const setNewOwner = async () => {
-        try {
-            if (window.ethereum) {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                const contract = new ethers.Contract(
-                    contractAddress.address,
-                    contractABI,
-                    signer
-                )
-                setIsLoading(true);
-                const newTx = await contract.newOwner(newAddress);
-                newTx.wait()
-                alert("You successfully give the access of the records to this adress: ", newAddress)
-                setIsLoading(false);
-
-            } else {
-                console.log('eth object not found')
-
-            }
-        } catch (e) {
-            console.log(e)
-
-        }
-    }
-
-    const setRemoveOwner = async () => {
-        try {
-          if (window.ethereum) {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const contract = new ethers.Contract(
-              contractAddress.address,
-              contractABI,
-              signer
-            );
-            setIsLoading(true);
-            console.log(newAddress)
-            const removeTx = await contract.removeOwner(newAddress);
-            await removeTx.wait();
-            console.log(removeTx)
-            alert("Successfully removed owner with address: " + newAddress);
-            setIsLoading(false);
-          } else {
-            console.log('eth object not found');
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
     return (
         <div className='h-screen w-screen  overflow-x-hidden  pb-40'>
             {!isLoading ? (
@@ -170,28 +99,9 @@ const NewRecords = () => {
                             <Loading value='Getting the Records' />
                         )}
                     </div>
-                    <div className='flex flex-col justify-center items-center'>
-                        <h1 className='text-2xl sm:text-3xl text-white underline underline-offset-8 pb-10 '>Give Access to someone</h1>
-                        <div className=' flex sm:space-x-4 flex-col space-y-8 sm:space-y-0 justify-center items-center sm:flex-row'>
-                            <input onChange={e => setNewAddress(e.target.value)} type="text" className=' p-2 w-60 sm:w-96 rounded-lg bg-slate-600 outline-none text-white tracking-wider' placeholder='Enter the account address' />
-                            <button onClick={setNewOwner} className='text-white bg-blue-600 sm:px-6 w-32 sm:w-40 py-[0.6rem] rounded-lg tracking-wider hover:scale-105 transition duration-200 font-semibold text-sm sm:text-[1rem] '>Give Access</button>
-                            <button onClick={setRemoveOwner} className='text-white bg-blue-600 sm:px-6 w-32 sm:w-40 py-[0.6rem] rounded-lg tracking-wider hover:scale-105 transition duration-200 font-semibold text-sm sm:text-[1rem] '>Remove Access</button>
-                        </div>
-                        <hr/>
-                    </div>
+                    
 
-                    <div className='flex justify-center items-center'>
-                        <div className='bg-gradient-to-tr from-neutral-800 via-gray-900 to-neutral-800 text-white  mt-20 lg:w-1/2 rounded-lg py-10 px-12 tracking-wide '>
-                            <h1 className='text-xl sm:text-2xl underline underline-offset-4 mb-7 font-bold'>Owners</h1>
-                            {ownersArray.map((owner, i) => {
-                                return (
-                                    <ul key={i}>
-                                        <li className='list-disc font-light text-lg'>{owner}</li>
-                                    </ul>
-                                )
-                            })}
-                        </div>
-                    </div>
+                    
                 </div>
             ) : (
                 <Loading value='connecting...' />
@@ -200,4 +110,4 @@ const NewRecords = () => {
     )
 }
 
-export default NewRecords
+export default Public

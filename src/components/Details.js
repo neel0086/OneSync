@@ -8,12 +8,16 @@ import { ethers } from 'ethers';
 
 const Details = () => {
     const location = useLocation();
-    const { address, contractAddress, contractABI  } = useStateContext();
+    const { address, contractAddress, contractABI } = useStateContext();
     const [ownersArray, setOwnersArray] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [newAddress, setNewAddress] = useState();
 
     const data = location.state?.data;
+    useEffect(() => {
+        setOwnersArray(location.state?.data.owners)
+    },[])
+    console.log(location.state.data.owners)
     const img = data.imageURL
     const handleClick = () => {
         let url = { img }
@@ -32,9 +36,10 @@ const Details = () => {
                 )
                 setIsLoading(true);
                 const newTx = await contract.newOwner(newAddress);
-                newTx.wait()
+                await newTx.wait()
                 alert("You successfully give the access of the records to this adress: ", newAddress)
                 setIsLoading(false);
+                console.log(await contract.getOneRecord(data.id))
 
             } else {
                 console.log('eth object not found')
@@ -48,28 +53,28 @@ const Details = () => {
 
     const setRemoveOwner = async () => {
         try {
-          if (window.ethereum) {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const contract = new ethers.Contract(
-              contractAddress.address,
-              contractABI,
-              signer
-            );
-            setIsLoading(true);
-            console.log(newAddress)
-            const removeTx = await contract.removeOwner(newAddress);
-            await removeTx.wait();
-            console.log(removeTx)
-            alert("Successfully removed owner with address: " + newAddress);
-            setIsLoading(false);
-          } else {
-            console.log('eth object not found');
-          }
+            if (window.ethereum) {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const contract = new ethers.Contract(
+                    contractAddress.address,
+                    contractABI,
+                    signer
+                );
+                setIsLoading(true);
+                console.log(newAddress)
+                const removeTx = await contract.removeOwner(newAddress);
+                await removeTx.wait();
+                console.log(removeTx)
+                alert("Successfully removed owner with address: " + newAddress);
+                setIsLoading(false);
+            } else {
+                console.log('eth object not found');
+            }
         } catch (e) {
-          console.log(e);
+            console.log(e);
         }
-      }
+    }
     return (
         <>
             <div className=' pb-20 lg:pb-40'>

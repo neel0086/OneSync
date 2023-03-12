@@ -13,6 +13,7 @@ contract meddata {
         address[] owners;
         uint256 timestamp;
     }
+    
 
     constructor() payable {}
 
@@ -62,6 +63,27 @@ contract meddata {
 
         return tempRecords;
     }
+    function getOneRecord(uint256 _id) public view returns (Record memory) {
+        require(records.length > 0, "no records");
+        for(uint256 i=0;i<records.length;i++){
+            if(records[i].id == _id ){
+                return records[i];
+            }
+        }
+        
+        
+        require(true,"Record not found");
+        return Record({
+                id: 0,
+                title: '',
+                description: '',
+                islisted: false,
+                imageURI: '',
+                owners: new address[](0),
+                timestamp: 0
+            });
+        
+    }
 
     function newOwner(address _newOwner) external payable {
         require(records.length > 0, "no records");
@@ -74,7 +96,7 @@ contract meddata {
             }
         }
     }
-
+    
     function removeOwner(address _removeOwner) external payable returns(Record[] memory) {
         
         require(records.length > 0, "no records");
@@ -94,4 +116,5 @@ contract meddata {
         }
         return records;
     }
+    
 }

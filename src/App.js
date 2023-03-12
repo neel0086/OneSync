@@ -9,6 +9,7 @@ import Details from './components/Details'
 import Footer from './components/Footer';
 import Loading from './components/Loading';
 import { ThirdwebProvider } from "@thirdweb-dev/react";
+import Public from './components/Public';
 
 
 
@@ -24,6 +25,7 @@ const App = () => {
             <Route path='/Publish' element={<Publish />} />
             <Route path='/records/details' element={<Details />} />
             <Route path='/loading' element={<Loading />} />
+            <Route path='/public' element={<Public />} />
           </Routes>
         </ThirdwebProvider>
         <Footer />
