@@ -1,5 +1,5 @@
 const hre = require('hardhat');
-const Main = async() => {
+const Main = async () => {
   const [deployer] = await hre.ethers.getSigners()
   const Contract = await hre.ethers.getContractFactory('meddata');
   const medContract = await Contract.deploy();
@@ -27,20 +27,20 @@ function saveFrontendFiles(contract, name) {
     JSON.stringify({ address: contract.address }, undefined, 2)
   );
 
-  const contractArtifact = artifacts.readArtifactSync(name);
-  
+  const contractArtifact = hre.artifacts.readArtifactSync(name);
+
   fs.writeFileSync(
     contractsDir + `/${name}.json`,
     JSON.stringify(contractArtifact, null, 2)
   );
 }
 
-const runMain = async() => {
-  try{
+const runMain = async () => {
+  try {
     await Main();
     process.exit(1);
   }
-  catch(err){
+  catch (err) {
     console.error(err);
     process.exit(0);
   }

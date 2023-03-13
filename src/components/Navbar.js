@@ -27,6 +27,9 @@ const Navbar = ({ account, onClickButton, handleLogout }) => {
                         <li>
                             <NavLink style={({ isActive }) => ({ color: isActive ? 'cyan' : 'white' })} to="/publish" className='mx-1 px-2 font-semibold'>Upload</NavLink>
                         </li>
+                        <li>
+                            <NavLink style={({ isActive }) => ({ color: isActive ? 'cyan' : 'white' })} to="/public" className='mx-1 px-2 font-semibold'>Public</NavLink>
+                        </li>
                     </ul>
 
 
@@ -88,9 +91,7 @@ const Navbar = ({ account, onClickButton, handleLogout }) => {
                         </div>
                     )
                 }
-
             </Transition>
-
         </nav >
     )
 }

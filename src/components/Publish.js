@@ -4,15 +4,17 @@ import { useStorageUpload } from "@thirdweb-dev/react";
 import { useContract, useSigner } from 'wagmi';
 import { ethers } from 'ethers';
 import Loading from './Loading';
+import { useNavigate } from 'react-router-dom';
 
 
 
-const Publish = () => {
+const Publish = ({ contract }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [filePath, setFilePath] = useState("");
   const { address, contractAddress, contractABI } = useStateContext();
   const { mutateAsync: upload } = useStorageUpload();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
 
@@ -29,13 +31,6 @@ const Publish = () => {
       setIsLoading(true);
       e.preventDefault();
       if (window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(
-          contractAddress.address,
-          contractABI,
-          signer
-        )
 
         const imageURI = await uploadToIpfs();
 
@@ -48,6 +43,7 @@ const Publish = () => {
         msgTx.wait();
         alert("The data is succesfully uploaded!!");
         setIsLoading(false);
+        navigate('/records');
 
       } else {
         console.log('eth object not found')
@@ -111,7 +107,7 @@ const Publish = () => {
           </form>
         </div>
 
-      ) : ( 
+      ) : (
         <Loading value='Wait for the transaction' />
       )}
     </div>

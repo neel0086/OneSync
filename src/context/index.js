@@ -4,9 +4,9 @@ import {
     getDefaultWallets,
     RainbowKitProvider,
 } from '@rainbow-me/rainbowkit';
-import { configureChains, createClient, useAccount, WagmiConfig} from 'wagmi';
+import { configureChains, createClient, useAccount, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
-import { useContext, createContext} from 'react';
+import { useContext, createContext } from 'react';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import abi from '../contractsData/meddata.json';
 import contractAddress from '../contractsData/meddata-address.json'
@@ -34,9 +34,6 @@ const ganache = {
     },
     testnet: true,
 };
-
-
-
 
 const { chains, provider } = configureChains(
     [ganache],

@@ -2,14 +2,12 @@
 pragma solidity ^0.8.19;
 
 contract meddata {
-    uint256 public totalRecord;
-
     struct Record {
         uint256 id;
         string title;
         string description;
         bool islisted;
-        string imageURI;
+        string imageURL;
         address[] owners;
         uint256 timestamp;
     }
@@ -17,81 +15,127 @@ contract meddata {
     constructor() payable {}
 
     Record[] public records;
-    mapping(address => uint256) setOwnership;
+
+    mapping(address => uint[]) accessList;
+    mapping(address => uint[]) createdBy;
+    mapping(uint => address[]) accessList1;
 
     address[] public temp;
-
-    function firstOwner() public {
-        temp.push(msg.sender);
-        setOwnership[msg.sender] = records.length;
-    }
 
     function NewRrecord(
         string memory _title,
         string memory _description,
-        string memory _imageURI
+        string memory _imageURL
     ) external payable {
-        firstOwner();
+        accessList[msg.sender].push(records.length);
+        createdBy[msg.sender].push(records.length);
+        accessList1[records.length].push(msg.sender);
+        uint length = records.length;
         records.push(
             Record({
-                id: block.timestamp,
+                id: length,
                 title: _title,
                 description: _description,
                 islisted: true,
-                imageURI: _imageURI,
+                imageURL: _imageURL,
                 owners: temp,
                 timestamp: block.timestamp
             })
         );
-
-        totalRecord += 1;
     }
 
     function getAllRecords() public view returns (Record[] memory) {
-        require(records.length > 0, "no records");
+        require(accessList[msg.sender].length > 0, "no records");
 
-        Record[] memory tempRecords = new Record[](records.length);
+        Record[] memory tempRecords = new Record[](
+            accessList[msg.sender].length
+        );
 
-        for (uint256 i = 0; i < records.length; i++) {
-            for (uint256 j = 0; j < records[i].owners.length; j++) {
-                if (records[i].owners[j] == msg.sender) {
-                    tempRecords[i] = records[i];
-                }
-            }
+        for (uint i = 0; i < accessList[msg.sender].length; i++) {
+            tempRecords[i] = (records[accessList[msg.sender][i]]);
         }
 
         return tempRecords;
     }
 
-    function newOwner(address _newOwner) external payable {
-        require(records.length > 0, "no records");
-        for (uint256 i = 0; i < records.length; i++) {
-            for (uint256 j = 0; j < records[i].owners.length; j++) {
-                if (records[i].owners[j] == msg.sender) {
-                    records[i].owners.push(_newOwner);
-                    break;
-                }
+    function getOneRecord(uint256 _id) public view returns (Record memory) {
+        require(_id < records.length, "given file id is not exists");
+        Record memory tempRecord = records[_id]; // will it going to create copy or referecnce
+        tempRecord.owners = accessList1[_id];
+        bool isAccessible = false;
+
+        for (uint i = 0; i < accessList1[_id].length; i++) {
+            if (accessList1[_id][i] == msg.sender) {
+                isAccessible = true;
             }
         }
+        require(isAccessible, "you don't have access to this file");
+        return tempRecord;
     }
 
-    function removeOwner(address _removeOwner) external payable returns(Record[] memory) {
-        
-        require(records.length > 0, "no records");
-        for (uint256 i = 0; i < records.length; i++) {
-            for (uint256 j = 0; j < records[i].owners.length; j++) {
-                if (
-                    records[i].owners[j] == _removeOwner &&
-                    records[i].owners[0] == msg.sender
-                ) {
-                    records[i].owners[j] = records[i].owners[
-                        records[i].owners.length - 1
-                    ];
-                    records[i].owners.pop();
-                    break;
-                }
+    function newOwner(address _newOwner, uint id) external {
+        // NOTE :- in accesslist1 first entry == creator of that record
+        require(id < records.length, "give file id is invalid");
+        require(
+            msg.sender == accessList1[id][0],
+            "you are not owner of this file"
+        );
+        require(
+            _newOwner != accessList1[id][0],
+            "as owner of this file you alread have a access"
+        );
+
+        for (uint i = 0; i < accessList[_newOwner].length; i++) {
+            if (id == accessList[_newOwner][i]) {
+                require(
+                    false,
+                    "this address already have a access to this file"
+                );
             }
         }
-        return records;
+        accessList[_newOwner].push(id);
+        accessList1[id].push(_newOwner);
+    }
+
+    function getAccessList(uint id) public view returns (address[] memory) {
+        require(id < records.length, "give file id is invalid");
+        return accessList1[id];
+    }
+
+    function removeOwner(address _removeOwner, uint id) external {
+        require(id < records.length, "give file id is invalid");
+        require(
+            msg.sender == accessList1[id][0],
+            "you are not owner of this file"
+        );
+        require(
+            _removeOwner != msg.sender,
+            "you are owner of the file and you can't remove your self from accessing this fiel"
+        );
+
+        uint length = accessList[_removeOwner].length;
+        for (uint i = 0; i < accessList[_removeOwner].length; i++) {
+            if (id == accessList[_removeOwner][i]) {
+                if (1 == accessList[_removeOwner].length) {
+                    accessList[_removeOwner].pop();
+                } else {
+                    accessList[_removeOwner][i] = accessList[_removeOwner][
+                        length - 1
+                    ];
+                    accessList[_removeOwner].pop();
+                }
+                //  we removed it from accessList now let's remove from accessList1
+                uint temp_length = accessList1[id].length;
+                for (uint j = 0; j < accessList1[id].length; j++) {
+                    if (_removeOwner == accessList1[id][j]) {
+                        accessList1[id][j] = accessList1[id][temp_length - 1];
+                        accessList1[id].pop();
+                    }
+                }
+                return;
+            }
+        }
+
+        require(false, "you doesn't give access to this address at all!!");
     }
 }
