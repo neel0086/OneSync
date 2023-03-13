@@ -6,8 +6,6 @@ import { ethers } from 'ethers';
 import Loading from './Loading';
 import { useNavigate } from 'react-router-dom';
 
-
-
 const Publish = ({ contract }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
