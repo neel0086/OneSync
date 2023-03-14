@@ -40,7 +40,7 @@ const Details = ({ contract }) => {
                 const temp = await newTx.wait();
                 const accessList = await contract.getAccessList(parseInt(id.split(':')[1]));
                 console.log(temp)
-                setRecord(prevState => ({ ...prevState, owners: accessList }));
+                setRecord(prevState => ({ ...prevState, accessibleBy: accessList }));
                 alert("You successfully give the access of the records to this adress: ", newAddress)
                 console.log(await contract.getOneRecord(record.id))
             } else {
@@ -68,7 +68,7 @@ const Details = ({ contract }) => {
                 const removeTx = await contract.removeOwner(newAddress, parseInt(id.split(':')[1]));
                 await removeTx.wait();
                 const accessList = await contract.getAccessList(parseInt(id.split(':')[1]));
-                setRecord(prevState => ({ ...prevState, owners: accessList }));
+                setRecord(prevState => ({ ...prevState, accessibleBy: accessList }));
                 console.log(removeTx)
                 alert("Successfully removed owner with address: " + newAddress);
             } else {
@@ -125,8 +125,8 @@ const Details = ({ contract }) => {
 
                     <div className='flex justify-center items-center'>
                         <div className='bg-gradient-to-tr from-neutral-800 via-gray-900 to-neutral-800 text-white  mt-20 lg:w-1/2 rounded-lg py-10 px-12 tracking-wide '>
-                            <h1 className='text-xl sm:text-2xl underline underline-offset-4 mb-7 font-bold'>Owners</h1>
-                            {record?.owners?.map((owner, i) => {
+                            <h1 className='text-xl sm:text-2xl underline underline-offset-4 mb-7 font-bold'>accessible </h1>
+                            {record?.accessibleBy?.map((owner, i) => {
                                 return (
                                     <ul key={i}>
                                         <li className='list-disc font-light text-lg'>{owner}</li>

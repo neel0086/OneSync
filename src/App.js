@@ -13,6 +13,9 @@ import { ethers } from 'ethers';
 import contractAddress from './contractsData/meddata-address.json'
 import abi from './contractsData/meddata.json';
 
+const reload = () => {
+  window.location.reload();
+}
 
 const App = () => {
 
@@ -26,12 +29,12 @@ const App = () => {
     const loadProvider = async () => {
       if (provider) {
 
-        window.ethereum.on("chainChanged", loadProvider);
+        window.ethereum.on("chainChanged", reload);
         // is it sufficient ?? OR WE NEED TO DO window.location.reload();
         // see description from chatgpt
 
 
-        window.ethereum.on("accountsChanged", loadProvider);
+        window.ethereum.on("accountsChanged", reload);
         // is it sufficient ?? OR WE NEED TO DO window.location.reload();
 
 
@@ -53,8 +56,8 @@ const App = () => {
     provider && loadProvider(); // i have doubt over here IT SHOULD NOT BE LIKE THIS => loadProvider();
     //  what if metamask is not installed in browser
     return () => {
-      window.ethereum.removeListener("chainChanged", loadProvider);
-      window.ethereum.removeListener("accountsChanged", loadProvider);
+      window.ethereum.removeListener("chainChanged", reload);
+      window.ethereum.removeListener("accountsChanged", reload);
     }
   }, []);
 

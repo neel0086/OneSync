@@ -11,6 +11,8 @@ contract meddata {
         address owner;
         address[] accessibleBy;
         uint256 timestamp;
+        uint price;
+        string preview;
     }
 
     constructor() payable {}
@@ -19,7 +21,6 @@ contract meddata {
 
     mapping(address => uint[]) accessList;
     mapping(address => uint[]) createdBy;
-    mapping(uint => address[]) accessList1;
 
     address[] temp = new address[](0);
 
@@ -30,7 +31,6 @@ contract meddata {
     ) external payable {
         accessList[msg.sender].push(records.length);
         createdBy[msg.sender].push(records.length);
-        accessList1[records.length].push(msg.sender);
         uint length = records.length;
         temp.push(msg.sender);
         records.push(
@@ -42,7 +42,9 @@ contract meddata {
                 imageURL: _imageURL,
                 owner: msg.sender,
                 accessibleBy: temp,
-                timestamp: block.timestamp
+                timestamp: block.timestamp,
+                price: 0,
+                preview: ""
             })
         );
         temp.pop();
@@ -68,8 +70,8 @@ contract meddata {
 
         bool isAccessible = false;
 
-        for (uint i = 0; i < accessList1[_id].length; i++) {
-            if (accessList1[_id][i] == msg.sender) {
+        for (uint i = 0; i < records[_id].accessibleBy.length; i++) {
+            if (records[_id].accessibleBy[i] == msg.sender) {
                 isAccessible = true;
             }
         }
@@ -78,14 +80,13 @@ contract meddata {
     }
 
     function newOwner(address _newOwner, uint id) external {
-        // NOTE :- in accesslist1 first entry == creator of that record
         require(id < records.length, "give file id is invalid");
         require(
-            msg.sender == accessList1[id][0],
+            msg.sender == records[id].owner,
             "you are not owner of this file"
         );
         require(
-            _newOwner != accessList1[id][0],
+            _newOwner != records[id].owner,
             "as owner of this file you alread have a access"
         );
 
@@ -114,7 +115,7 @@ contract meddata {
         );
         require(
             _removeOwner != msg.sender,
-            "you are owner of the file and you can't remove your self from accessing this fiel"
+            "as owner of the file and you can't remove your self from access to this file"
         );
 
         uint length = accessList[_removeOwner].length;
@@ -128,10 +129,9 @@ contract meddata {
                     ];
                     accessList[_removeOwner].pop();
                 }
-                //  we removed it from accessList now let's remove from accessList1
                 uint temp_length = records[id].accessibleBy.length;
                 for (uint j = 0; j < records[id].accessibleBy.length; j++) {
-                    if (_removeOwner == accessList1[id][j]) {
+                    if (_removeOwner == records[id].accessibleBy[j]) {
                         records[id].accessibleBy[j] = records[id].accessibleBy[
                             temp_length - 1
                         ];
@@ -141,7 +141,6 @@ contract meddata {
                 return;
             }
         }
-
         require(false, "you doesn't give access to this address at all!!");
     }
 }

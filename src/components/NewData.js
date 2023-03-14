@@ -20,7 +20,8 @@ const NewRecords = ({ contract }) => {
                             title: record.title,
                             description: record.description,
                             timestamp: new Date(record.timestamp * 1000).toString(),
-                            imageURL: record.imageURL
+                            imageURL: record.imageURL,
+                            owner: record.owner
                         })
                     })
                     let recordsNew = []
@@ -46,6 +47,16 @@ const NewRecords = ({ contract }) => {
 
     }, [contract])
 
+    const [searchAddress, setSearchAddress] = useState('');
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        console.log(searchAddress);
+        const tempArray = recordsArray.filter(record => record.owner == searchAddress);
+        console.log(tempArray)
+        setRecordsArray(tempArray);
+    }
+
     return (
         <div className='h-screen w-screen  overflow-x-hidden  pb-40'>
             {!isLoading ? (
@@ -55,6 +66,10 @@ const NewRecords = ({ contract }) => {
                             <div>
                                 <div className='flex justify-center mt-2'>
                                     <h1 className='text-white text-lg md:text-xl lg:text-3xl tracking-wider uppercase pt-28 lg:px-32 pb-5 underline underline-offset-8 font-bold '>YOUR RECORDS</h1>
+                                    <h1 className='text-white text-lg md:text-xl lg:text-3xl tracking-wider uppercase pt-28 lg:px-32 pb-5 underline underline-offset-8 font-bold '>
+                                        <input type="text" placeholder="give owner address" onChange={(e) => setSearchAddress(e.target.value)} />
+                                        <button onClick={handleSearch}>search</button>
+                                    </h1>
                                 </div>
                                 <div className='grid xl:grid-cols-4 xl:gap-x-28 xl:px-20 xl:gap-y-14 xl:pb-32 gap-y-6 lg:grid-cols-3 md:grid-cols-3 md:gap-x-4 pb-20 pt-10 justify-center'>
                                     {recordsArray.length < 1 ? (

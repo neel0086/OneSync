@@ -38,7 +38,7 @@ const Publish = ({ contract }) => {
           `${imageURI}`
         )
 
-        msgTx.wait();
+        await msgTx.wait();
         alert("The data is succesfully uploaded!!");
         setIsLoading(false);
         navigate('/records');
