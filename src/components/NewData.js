@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import Loading from './Loading';
+import { ethers } from 'ethers';
 
 const NewRecords = ({ contract }) => {
     const [recordsArray, setRecordsArray] = useState([]);
+    const recordArrayHelper = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -13,6 +15,7 @@ const NewRecords = ({ contract }) => {
             try {
                 if (contract) {
                     const records = await contract.getAllRecords();
+                    console.log(records)
                     let recordsClean = [];
                     records.forEach((record) => {
                         recordsClean.push({
@@ -21,6 +24,7 @@ const NewRecords = ({ contract }) => {
                             description: record.description,
                             timestamp: new Date(record.timestamp * 1000).toString(),
                             imageURL: record.imageURL,
+                            price : parseInt(record.price),
                             owner: record.owner
                         })
                     })
@@ -32,6 +36,7 @@ const NewRecords = ({ contract }) => {
                     }
                     console.log(recordsNew)
                     setRecordsArray(recordsNew);
+                    recordArrayHelper.current = recordsNew;
                 } else {
                     console.log("ethreuem object not found")
                 }
@@ -48,11 +53,22 @@ const NewRecords = ({ contract }) => {
     }, [contract])
 
     const [searchAddress, setSearchAddress] = useState('');
+    const [subscription, setSubscription] = useState('free')
 
     const handleSearch = (event) => {
         event.preventDefault();
         console.log(searchAddress);
-        const tempArray = recordsArray.filter(record => record.owner == searchAddress);
+        var tempArray = recordArrayHelper.current;
+        if ('' !== searchAddress)
+            if ('free' === subscription)
+                tempArray = recordArrayHelper.current.filter(record => ((record.owner == searchAddress) && (record.price == 0)));
+            else
+                tempArray = recordArrayHelper.current.filter(record => ((record.owner == searchAddress) && (record.price != 0)));
+        else
+            if ('free' === subscription)
+                tempArray = recordArrayHelper.current.filter(record => ((record.price == 0)));
+            else
+                tempArray = recordArrayHelper.current.filter(record => ((record.price != 0)));
         console.log(tempArray)
         setRecordsArray(tempArray);
     }
@@ -68,8 +84,17 @@ const NewRecords = ({ contract }) => {
                                     <h1 className='text-white text-lg md:text-xl lg:text-3xl tracking-wider uppercase pt-28 lg:px-32 pb-5 underline underline-offset-8 font-bold '>YOUR RECORDS</h1>
                                     <h1 className='text-white text-lg md:text-xl lg:text-3xl tracking-wider uppercase pt-28 lg:px-32 pb-5 underline underline-offset-8 font-bold '>
                                         <input type="text" placeholder="give owner address" onChange={(e) => setSearchAddress(e.target.value)} />
+                                    </h1>
+                                    <h1 className='text-white text-lg md:text-xl lg:text-3xl tracking-wider uppercase pt-28 lg:px-32 pb-5 underline underline-offset-8 font-bold '>
+                                        <select name="subscription" onChange={(e) => setSubscription(e.target.value)}>
+                                            <option value="free">Free</option>
+                                            <option value="paid">Paid</option>
+                                        </select>
+                                    </h1>
+                                    <h1 className='text-white text-lg md:text-xl lg:text-3xl tracking-wider uppercase pt-28 lg:px-32 pb-5 underline underline-offset-8 font-bold '>
                                         <button onClick={handleSearch}>search</button>
                                     </h1>
+
                                 </div>
                                 <div className='grid xl:grid-cols-4 xl:gap-x-28 xl:px-20 xl:gap-y-14 xl:pb-32 gap-y-6 lg:grid-cols-3 md:grid-cols-3 md:gap-x-4 pb-20 pt-10 justify-center'>
                                     {recordsArray.length < 1 ? (

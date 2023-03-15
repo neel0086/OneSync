@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
-const Details = ({ contract }) => {
+const Details = ({ contract, accountAddress }) => {
     const { id } = useParams();
     console.log(id);
     const navigate = useNavigate();
@@ -16,9 +16,34 @@ const Details = ({ contract }) => {
             try {
                 const record = await contract.getOneRecord(parseInt(id.split(':')[1]));
                 console.log('from use effect')
-                console.log(record);
-                setRecord(record);
+                console.log(record.price._hex);
+                // // record.newPrice = parseInt(record.price._hex)
+                // console.log({
+                //     id: record.id._hex,
+                //     accessibleBy: record.accessibleBy,
+                //     description: record.description,
+                //     imageURL: record.imageURL,
+                //     islisted: record.islisted,
+                //     notifaction: record.notifaction,
+                //     owner: record.owner,
+                //     preview: record.preview,
+                //     price: parseInt(record.price._hex),
+                //     title: record.title
+                // });
+                setRecord({
+                    id: record.id._hex,
+                    accessibleBy: record.accessibleBy,
+                    description: record.description,
+                    imageURL: record.imageURL,
+                    islisted: record.islisted,
+                    notifaction: record.notifaction,
+                    owner: record.owner,
+                    preview: record.preview,
+                    price: parseInt(record.price._hex),
+                    title: record.title
+                });
             } catch (error) {
+                console.log(error)
                 if (error.data.message.includes("you don't have access to this file")) {
                     alert("you don't have access to this file");
                 } else if (error.data.message.includes("given file id is not exists")) {
@@ -85,6 +110,17 @@ const Details = ({ contract }) => {
         }
         setIsLoading(false);
     }
+
+    const sellHelper = async (event) => {
+        event.preventDefault();
+        const price = window.prompt('give price value');
+        const preview = window.prompt('give preview information');
+        console.log(price);
+        console.log(preview);
+        const temp = await contract.sellTheFile(record.id, preview, parseInt(price));
+        await temp.wait();
+    }
+
     return (
         <>
             {isLoading && <>it is loading</>}
@@ -105,34 +141,56 @@ const Details = ({ contract }) => {
 
                                     <hr />
                                     <p className='text-justify text-lg mt-6 tracking-wider font-light'>Description: {record.description}</p>
+                                    <p className='text-justify text-lg mt-6 tracking-wider font-light'>
+                                        {((accountAddress == record.owner) && (0 == record.price)) && <button onClick={sellHelper}>sell this imgae</button>}
+                                    </p>
                                     {/* <p className='text-justify mt-6 tracking-wider text-lg'>Recordtime: {data.timestamp}</p> */}
                                 </div>
                             </div>
-
                         </div>
                         <div className='flex justify-center items-center mt-10 text-white'>
                         </div>
                     </div>
                     <div className='flex flex-col justify-center items-center'>
                         <h1 className='text-2xl sm:text-3xl text-white underline underline-offset-8 pb-10 '>Give Access to someone</h1>
-                        <div className=' flex sm:space-x-4 flex-col space-y-8 sm:space-y-0 justify-center items-center sm:flex-row'>
-                            <input onChange={e => setNewAddress(e.target.value)} type="text" className=' p-2 w-60 sm:w-96 rounded-lg bg-slate-600 outline-none text-white tracking-wider' placeholder='Enter the account address' />
-                            <button onClick={setNewOwner} className='text-white bg-blue-600 sm:px-6 w-32 sm:w-40 py-[0.6rem] rounded-lg tracking-wider hover:scale-105 transition duration-200 font-semibold text-sm sm:text-[1rem] '>Give Access</button>
-                            <button onClick={setRemoveOwner} className='text-white bg-blue-600 sm:px-6 w-32 sm:w-40 py-[0.6rem] rounded-lg tracking-wider hover:scale-105 transition duration-200 font-semibold text-sm sm:text-[1rem] '>Remove Access</button>
-                        </div>
-                        <hr />
+                        {'0' == record.price &&
+                            <>
+                                <div className=' flex sm:space-x-4 flex-col space-y-8 sm:space-y-0 justify-center items-center sm:flex-row'>
+                                    <input onChange={e => setNewAddress(e.target.value)} type="text" className=' p-2 w-60 sm:w-96 rounded-lg bg-slate-600 outline-none text-white tracking-wider' placeholder='Enter the account address' />
+                                    <button onClick={setNewOwner} className='text-white bg-blue-600 sm:px-6 w-32 sm:w-40 py-[0.6rem] rounded-lg tracking-wider hover:scale-105 transition duration-200 font-semibold text-sm sm:text-[1rem] '>Give Access</button>
+                                    <button onClick={setRemoveOwner} className='text-white bg-blue-600 sm:px-6 w-32 sm:w-40 py-[0.6rem] rounded-lg tracking-wider hover:scale-105 transition duration-200 font-semibold text-sm sm:text-[1rem] '>Remove Access</button>
+                                </div>
+                                <hr />
+                            </>
+                        }
                     </div>
 
                     <div className='flex justify-center items-center'>
                         <div className='bg-gradient-to-tr from-neutral-800 via-gray-900 to-neutral-800 text-white  mt-20 lg:w-1/2 rounded-lg py-10 px-12 tracking-wide '>
-                            <h1 className='text-xl sm:text-2xl underline underline-offset-4 mb-7 font-bold'>accessible </h1>
-                            {record?.accessibleBy?.map((owner, i) => {
-                                return (
-                                    <ul key={i}>
-                                        <li className='list-disc font-light text-lg'>{owner}</li>
-                                    </ul>
-                                )
-                            })}
+                            {'0' == record.price &&
+                                <>
+                                    <h1 className='text-xl sm:text-2xl underline underline-offset-4 mb-7 font-bold'>accessible </h1>
+                                    {record?.accessibleBy?.map((owner, i) => {
+                                        return (
+                                            <ul key={i}>
+                                                <li className='list-disc font-light text-lg'>{owner}</li>
+                                            </ul>
+                                        )
+                                    })}
+                                </>
+                            }
+                            {'0' != record.price && record.owner == accountAddress &&
+                                <>
+                                    <h1 className='text-xl sm:text-2xl underline underline-offset-4 mb-7 font-bold'>Bought by </h1>
+                                    {record?.accessibleBy?.map((owner, i) => {
+                                        return (
+                                            <ul key={i}>
+                                                <li className='list-disc font-light text-lg'>{owner}</li>
+                                            </ul>
+                                        )
+                                    })}
+                                </>
+                            }
                         </div>
                     </div>
                 </>

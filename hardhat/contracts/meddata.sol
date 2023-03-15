@@ -14,6 +14,7 @@ contract meddata {
         uint price;
         string preview;
     }
+    uint[] public sellingFileId;
 
     constructor() payable {}
 
@@ -21,8 +22,13 @@ contract meddata {
 
     mapping(address => uint[]) accessList;
     mapping(address => uint[]) createdBy;
+    mapping(address => mapping(uint => bool)) isBought;
+    mapping(address => mapping(uint => bool)) isDeposited;
+    mapping(uint=>address[]) txnDetails;
+    uint256 totalEtherReceived;
 
     address[] temp = new address[](0);
+    address[] demo = new address[](0);
 
     function NewRrecord(
         string memory _title,
@@ -50,6 +56,72 @@ contract meddata {
         temp.pop();
     }
 
+    function sellTheFile(uint id, string memory preview, uint price) external {
+        require(id < records.length, "give file id is invalid");
+        require(
+            records[id].owner == msg.sender,
+            "you are not owner of this file"
+        );
+        require(
+            records[id].price == 0,
+            "you are already added this file to sell"
+        );
+        isBought[msg.sender][id] = true; // owner already own this file SO we can say he already bought this file and it is neccecary so don't remove it
+
+        // records[id].accessibleBy.pop(); // now owner does not have contro of this file [MEANS:-any one can buy this image and see it owner can't restrict them]
+        sellingFileId.push(id);
+        records[id].preview = preview;
+        records[id].price = price;
+    }
+
+    function buyFileId(uint id) public payable {
+        require(id < records.length, "give file id is invalid");
+        for (uint i = 0; i < sellingFileId.length; i++) {
+            if (id == sellingFileId[i]) {
+                if (isBought[msg.sender][id]) {
+                    require(false, "you already bought this file");
+                } else {
+                    require(
+                        msg.sender.balance >= records[id].price,
+                        "Insufficient balance"
+                    );
+                    (payable(records[id].owner)).transfer(msg.value);
+                    isBought[msg.sender][id] = true;
+                    records[id].accessibleBy.push(msg.sender);
+                    accessList[msg.sender].push(id);
+                    return;
+                }
+            }
+        }
+    }
+
+    function giveContractBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+
+    function addToContractBalance() public payable {
+        // Transfer the amount of ether sent with the transaction to the contract address
+        address payable contractAddress = payable(address(this));
+        contractAddress.transfer(msg.value);
+    }
+
+    function getSellingRecord() public view returns (Record[] memory) {
+        uint cnt = 0;
+        for (uint i = 0; i < sellingFileId.length; i++) {
+            if (false == isBought[msg.sender][sellingFileId[i]]) {
+                cnt += 1;
+            }
+        }
+        Record[] memory tempRecords = new Record[](cnt);
+        uint j = 0;
+        for (uint i = 0; i < sellingFileId.length; i++) {
+            if (false == isBought[msg.sender][sellingFileId[i]]) {
+                tempRecords[j++] = records[sellingFileId[i]];
+            }
+        }
+        return tempRecords;
+    }
+
     function getAllRecords() public view returns (Record[] memory) {
         require(accessList[msg.sender].length > 0, "no records");
 
@@ -75,6 +147,8 @@ contract meddata {
                 isAccessible = true;
             }
         }
+        if (false == isAccessible && 0 != tempRecord.price)
+            isAccessible = isBought[msg.sender][_id];
         require(isAccessible, "you don't have access to this file");
         return tempRecord;
     }

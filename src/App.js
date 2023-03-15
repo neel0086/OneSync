@@ -12,6 +12,7 @@ import { ThirdwebProvider } from "@thirdweb-dev/react";
 import { ethers } from 'ethers';
 import contractAddress from './contractsData/meddata-address.json'
 import abi from './contractsData/meddata.json';
+import Shop from './components/Shop';
 
 const reload = () => {
   window.location.reload();
@@ -70,7 +71,8 @@ const App = () => {
             <Route path='/' element={<Home />} />
             <Route path='/records' element={<NewData contract={contract} />} />
             <Route path='/Publish' element={<Publish contract={contract} />} />
-            <Route path='/records/details/:id' element={<Details contract={contract} />} />
+            <Route path='/records/details/:id' element={<Details contract={contract} accountAddress={account} />} />
+            <Route path='/shop' element={<Shop contract={contract} />} />
             <Route path='/loading' element={<Loading />} />
           </Routes>
         </ThirdwebProvider>
