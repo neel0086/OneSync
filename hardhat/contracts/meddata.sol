@@ -14,6 +14,17 @@ contract meddata {
         uint price;
         string preview;
     }
+
+    struct CouponDetails {
+        string code;
+        uint256 value;
+        uint expiryTime;
+    }
+
+    mapping(uint256 => CouponDetails) public coupons;
+    event CouponGenerated(string code, uint256 value, uint256 expiryTime);
+    event CouponRedeemed(string code, address user, uint256 redeemedTime);
+
     uint[] public sellingFileId;
 
     constructor() payable {}
@@ -24,7 +35,7 @@ contract meddata {
     mapping(address => uint[]) createdBy;
     mapping(address => mapping(uint => bool)) isBought;
     mapping(address => mapping(uint => bool)) isDeposited;
-    mapping(uint=>address[]) txnDetails;
+    mapping(uint => address[]) txnDetails;
     uint256 totalEtherReceived;
 
     address[] temp = new address[](0);
@@ -216,5 +227,32 @@ contract meddata {
             }
         }
         require(false, "you doesn't give access to this address at all!!");
+    }
+
+    function generateCoupon(
+        uint256 id,
+        string memory code,
+        uint256 value,
+        uint256 expiryTime
+    ) public {
+        // require(coupons[id].expiryTime == 0, "Coupon code already exists");
+        expiryTime=block.timestamp + 3600;
+        coupons[id] = CouponDetails(code, value, expiryTime);
+        emit CouponGenerated(code, value, expiryTime);
+    }
+
+    function redeemCoupon(uint256 id, string memory code) public {
+        require(
+            coupons[id].expiryTime < block.timestamp,
+            "Coupon code has expired"
+        );
+        if (coupons[id].expiryTime > block.timestamp) {
+            isBought[msg.sender][id] = true;
+            records[id].accessibleBy.push(msg.sender);
+            accessList[msg.sender].push(id);
+            uint256 redeemedTime = block.timestamp;
+            delete coupons[id];
+            emit CouponRedeemed(code, msg.sender, redeemedTime);
+        }
     }
 }

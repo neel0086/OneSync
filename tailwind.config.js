@@ -10,6 +10,16 @@ module.exports = {
         righteous: ['Righteous', 'cursive']
     },
     },
+    extend: {
+      invert:{
+        0.1:'0.1',
+        0.2:'0.2',
+        0.5:'0.5',
+        0.7:'0.7',
+        0.8:'0.8',
+        0.9:'0.9'
+      }
+    }
   },
   plugins: [],
 }

@@ -44,11 +44,11 @@ const Details = ({ contract, accountAddress }) => {
                 });
             } catch (error) {
                 console.log(error)
-                if (error.data.message.includes("you don't have access to this file")) {
-                    alert("you don't have access to this file");
-                } else if (error.data.message.includes("given file id is not exists")) {
-                    alert("given file id is not exists");
-                }
+                // if (error.data.message.includes("you don't have access to this file")) {
+                //     alert("you don't have access to this file");
+                // } else if (error.data.message.includes("given file id is not exists")) {
+                //     alert("given file id is not exists");
+                // }
                 navigate('/records');
             }
             setIsLoading(false);
@@ -128,22 +128,39 @@ const Details = ({ contract, accountAddress }) => {
                 <>
                     <div className=' pb-20 lg:pb-40'>
                         <div className='pt-36 w-screen  flex  justify-center items-center overflow-hidden '>
-                            <div className='flex lg:space-x-24 w-11/12 flex-col lg:flex-row justify-center items-center lg:items-start px-3 lg:px-20 '>
+                            <div className='flex lg:space-x-24 w-11/12 flex-col lg:flex-row justify-around items-center lg:items-start px-3 lg:px-20 '>
                                 <div className='min-w-max'>
                                     <a href={record.imageURL} >
-                                        <img src={record.imageURL} alt="" className=' h-72 w-72 sm:h-96 sm:w-96 md:h-80 lg:h-[30rem] lg:w-[30rem] border-4 border-black' />
+                                        <img src={record.imageURL} alt="" className='hover:scale-110 hover:z-0 transition duration-500 ease-in-out h-72 w-72 sm:h-96 sm:w-96 md:h-80 lg:h-[30rem] lg:w-[30rem] border-4 border-black' />
                                     </a>
                                 </div>
 
                                 <div className='text-white mt-12 mb-20'>
-                                    <p className='tracking-wider font-bold text-4xl break-all pb-4'>{record.title}</p>
-                                    <p className='tracking-wider font-bold text-xl break-all'>Click on the image to download it!</p>
+                                    <p className='tracking-wider font-roboto text-4xl break-all pb-4'>{record.title}</p>
+                                    {/* <p className='tracking-wider font-bold text-xl break-all'>Click on the image to download it!</p> */}
 
                                     <hr />
-                                    <p className='text-justify text-lg mt-6 tracking-wider font-light'>Description: {record.description}</p>
+                                    <p className='text-justify text-lg mt-6 tracking-wider font-light'> {record.description}</p>
                                     <p className='text-justify text-lg mt-6 tracking-wider font-light'>
-                                        {((accountAddress == record.owner) && (0 == record.price)) && <button onClick={sellHelper}>sell this imgae</button>}
+                                        {((accountAddress == record.owner) && (0 == record.price)) &&
+                                            <div>
+                                                <a onClick={sellHelper} href="#_" class="relative inline-flex items-center justify-center px-10 py-4 overflow-hidden font-mono font-medium tracking-tighter text-white bg-gray-800 rounded-lg group">
+                                                    <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-zinc-900 rounded-full group-hover:w-56 group-hover:h-56"></span>
+                                                    <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
+                                                    <span class="relative">Sell This Image</span>
+                                                </a>
+
+                                            </div>}
+                                        {(accountAddress == record.owner) &&
+                                            <a onClick={(e) => { contract.generateCoupon(record.id, "abcde", 30, 20) }} href="#_" class="relative inline-flex items-center justify-center px-10 py-4 overflow-hidden font-mono font-medium tracking-tighter text-white bg-gray-800 rounded-lg group">
+                                                <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-zinc-900 rounded-full group-hover:w-56 group-hover:h-56"></span>
+                                                <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
+                                                <span class="relative">Genrate Code</span>
+                                            </a>
+
+                                        }
                                     </p>
+                                    {/* <button onClick={sellHelper}>sell this imgae</button> */}
                                     {/* <p className='text-justify mt-6 tracking-wider text-lg'>Recordtime: {data.timestamp}</p> */}
                                 </div>
                             </div>
