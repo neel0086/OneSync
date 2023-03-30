@@ -15,6 +15,7 @@ const Details = ({ contract, accountAddress }) => {
             console.log('function is called')
             try {
                 const record = await contract.getOneRecord(parseInt(id.split(':')[1]));
+                const accessList = await contract.getAccessList(parseInt(id.split(':')[1]));
                 console.log('from use effect')
                 console.log(record.price._hex);
                 // // record.newPrice = parseInt(record.price._hex)
@@ -32,7 +33,7 @@ const Details = ({ contract, accountAddress }) => {
                 // });
                 setRecord({
                     id: record.id._hex,
-                    accessibleBy: record.accessibleBy,
+                    accessibleBy: accessList,
                     description: record.description,
                     imageURL: record.imageURL,
                     islisted: record.islisted,
@@ -60,6 +61,7 @@ const Details = ({ contract, accountAddress }) => {
         setIsLoading(true);
         try {
             if (window.ethereum) {
+                console.log(newAddress);
                 const newTx = await contract.newOwner(newAddress, parseInt(id.split(':')[1]));
                 console.log(newTx);
                 const temp = await newTx.wait();
@@ -120,7 +122,7 @@ const Details = ({ contract, accountAddress }) => {
         const temp = await contract.sellTheFile(record.id, preview, parseInt(price));
         await temp.wait();
     }
-    const CouponProcess = async(e)=>{
+    const CouponProcess = async (e) => {
         var code = await contract.generateCoupon(record.id, "abcdef", 30, 20)
         await code.wait()
         console.log(code)
