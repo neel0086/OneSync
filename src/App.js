@@ -27,8 +27,6 @@ const App = () => {
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-
-
     const loadProvider = async () => {
       if (provider) {
 
@@ -48,22 +46,6 @@ const App = () => {
         console.log(address);
         console.log(contractAddress)
         const contract = new ethers.Contract(contractAddress.address, abi.abi, signer);
-        const data = await contract.helper('drumil14')
-        console.log(data);
-        try {
-          const data = await contract.getUserName();
-          console.log(data);
-        } catch (error) {
-          console.log(error);
-          if (error.data.message.includes("please give user name")) {
-            const name = window.prompt("please give your user name");
-            console.log(name);
-            const temp = await contract.storeUserName(name);
-            await temp.wait();
-            const data = await contract.getUserName();
-            console.log(data);
-          }
-        }
         setContract(contract);
         setProvider(provider);
         console.log(contract)

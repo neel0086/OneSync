@@ -27,7 +27,6 @@ contract syncdata {
     constructor() payable {}
 
     address[] temp = new address[](0);
-    string[] temp1 = new string[](0);
     address[] demo = new address[](0);
     uint256 totalEtherReceived;
 
@@ -37,8 +36,6 @@ contract syncdata {
     mapping(address => mapping(uint => bool)) isBought;
     mapping(address => mapping(uint => bool)) isDeposited;
     mapping(uint => address[]) txnDetails;
-    mapping(address => string) addressToUserNameMapping;
-    mapping(string => address) userNameToAddressMapping;
 
     event CouponGenerated(string code, uint256 value, uint256 expiryTime);
     event CouponRedeemed(string code, address user, uint256 redeemedTime);
@@ -87,11 +84,11 @@ contract syncdata {
         records[id].price = price;
     }
 
-    function getOwnersRecords() public view returns (Record[] memory) {
+    function getOwnersRecords() public view returns (Record[] memory){  
         Record[] memory tempRecords = new Record[](
             createdBy[msg.sender].length
         );
-        for (uint i = 0; i < createdBy[msg.sender].length; i++) {
+        for(uint i=0;i<createdBy[msg.sender].length;i++){
             tempRecords[i] = records[createdBy[msg.sender][i]];
         }
         return tempRecords;
@@ -176,16 +173,11 @@ contract syncdata {
         return tempRecord;
     }
 
-    function newOwner(string memory _newOwnerUserName, uint id) external {
+    function newOwner(address _newOwner, uint id) external {
         require(id < records.length, "give file id is invalid");
         require(
             msg.sender == records[id].owner,
             "you are not owner of this file"
-        );
-        address _newOwner = userNameToAddressMapping[_newOwnerUserName];
-        require(
-            _newOwner != address(0),
-            "given user name is not exists at all"
         );
         require(
             _newOwner != records[id].owner,
@@ -204,33 +196,16 @@ contract syncdata {
         records[id].accessibleBy.push(_newOwner);
     }
 
-    function helper(string memory temp2) public view returns (address) {
-        return userNameToAddressMapping[temp2];
-    }
-
-    function getAccessList(uint id) public view returns (string[] memory) {
+    function getAccessList(uint id) public view returns (address[] memory) {
         require(id < records.length, "give file id is invalid");
-        string[] memory userNames = new string[](
-            records[id].accessibleBy.length
-        );
-        for (uint i = 0; i < records[id].accessibleBy.length; i++) {
-            userNames[i] = addressToUserNameMapping[
-                records[id].accessibleBy[i]
-            ];
-        }
-        return userNames;
+        return records[id].accessibleBy;
     }
 
-    function removeOwner(string memory _removeOwnerUserName, uint id) external {
+    function removeOwner(address _removeOwner, uint id) external {
         require(id < records.length, "give file id is invalid");
         require(
             msg.sender == records[id].owner,
             "you are not owner of this file"
-        );
-        address _removeOwner = userNameToAddressMapping[_removeOwnerUserName];
-        require(
-            _removeOwner != address(0),
-            "given user name is not exists at all"
         );
         require(
             _removeOwner != msg.sender,
@@ -263,19 +238,6 @@ contract syncdata {
         require(false, "you doesn't give access to this address at all!!");
     }
 
-    function getUserName() public view returns (string memory) {
-        bytes storage stringBytes = bytes(addressToUserNameMapping[msg.sender]);
-        require(stringBytes.length != 0, "please give user name");
-        return addressToUserNameMapping[msg.sender];
-    }
-
-    function storeUserName(string memory userName) public {
-        bytes storage stringBytes = bytes(addressToUserNameMapping[msg.sender]);
-        require(stringBytes.length == 0, "you already have an user name");
-        addressToUserNameMapping[msg.sender] = userName;
-        userNameToAddressMapping[userName] = msg.sender;
-    }
-
     function generateCoupon(
         uint256 id,
         string memory code,
@@ -284,12 +246,11 @@ contract syncdata {
     ) public returns (string memory) {
         // require(coupons[id].expiryTime == 0, "Coupon code already exists");
         expiryTime = block.timestamp + 3600;
-
+        
         coupons[id] = CouponDetails(code, value, expiryTime);
         emit CouponGenerated(code, value, expiryTime);
         return code;
     }
-
     function redeemCoupon(uint256 id, string memory code) public {
         // require(
         //     coupons[id].expiryTime < block.timestamp,
