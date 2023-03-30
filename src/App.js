@@ -10,8 +10,8 @@ import Footer from './components/Footer';
 import Loading from './components/Loading';
 import { ThirdwebProvider } from "@thirdweb-dev/react";
 import { ethers } from 'ethers';
-import contractAddress from './contractsData/syncdata-address.json'
-import abi from './contractsData/syncdata.json';
+import contractAddress from './contractsData/meddata-address.json'
+import abi from './contractsData/meddata.json';
 import Shop from './components/Shop';
 
 const reload = () => {
@@ -63,7 +63,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className='App overflow-hidden bg-gradient-to-tr from-neutral-700 via-gray-800 to-neutral-900'>
+    <div className='overflow-hidden bg-gradient-to-tr from-neutral-700 via-gray-800 to-neutral-900'>
       <StateContextProvider>
         <Navbar />
         <ThirdwebProvider>

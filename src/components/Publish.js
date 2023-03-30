@@ -66,7 +66,6 @@ const Publish = ({ contract }) => {
           <h1 className='text-2xl text-white tracking-wider font-bold'>Post a new Record</h1>
           <div className=' h-[0.125rem] bg-slate-600 my-2'></div>
           <form action="" className='flex flex-col justify-center' onSubmit={uploadData}>
-            
             <div className='mb-4'>
               <label className='text-white ml-3'>Title</label>
               <input

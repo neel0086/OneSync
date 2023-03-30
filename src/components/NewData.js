@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom';
 import Loading from './Loading';
-import NothingToShow from '../assets/nothing.png'
 import { ethers } from 'ethers';
 
 const NewRecords = ({ contract }) => {
     const [recordsArray, setRecordsArray] = useState([]);
-    const [ownerRecords,SetOwnerRecords] = useState([]);
     const recordArrayHelper = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
     const [paidOrFree, setPaidOrFree] = useState(false)
@@ -51,12 +49,7 @@ const NewRecords = ({ contract }) => {
             }
             setIsLoading(false);
         }
-        const getOwnerRecords = async () => {
-            const records = await contract.getAllRecords();
-            SetOwnerRecords(records)
-        };
         contract && getAllRecords();
-        contract && getOwnerRecords();
 
     }, [contract])
 
@@ -134,41 +127,13 @@ const NewRecords = ({ contract }) => {
                                     </div>
 
                                 </div>
-                                <div className="xl:px-20 mt-2">
-                                    <h1 className='border-b-2 border-b-zinc-900 border-opacity-10 invert-0.5'>PURCHASED</h1>
-                                </div>
                                 <div className='grid xl:grid-cols-4 xl:gap-x-28 xl:px-20 xl:gap-y-14 xl:pb-32 gap-y-6 lg:grid-cols-3 md:grid-cols-3 md:gap-x-4 pb-20 pt-10 justify-center'>
                                     {recordsArray.length < 1 ? (
                                         <div>
-                                            {/* <img src={NothingToShow} className="w-16"></img> */}
                                             <span className='text-white text-lg md:text-xl lg:text-2xl tracking-wider set-8 font-bold'>No records to show</span>
                                         </div>
                                     ) : (
                                         recordsArray.map((record, i) => {
-                                            return (
-                                                <div className='lg:h-42 w-64 bg-black rounded-xl text-white p-3 flex flex-col space-y-3 tracking-wide text-lg h-42' key={i}>
-                                                    <div className='overflow-hidden rounded-xl cursor-pointer  '>
-                                                        <Link to={`/records/details/:${record.id}`} state={{ data: record }}>
-                                                            <img src={record.imageURL} alt="" className=' hover:scale-110 hover:z-0 transition duration-500 ease-in-out h-56' />
-                                                        </Link>
-                                                    </div>
-                                                    <h1 className='tracking-wider font-roboto text-lg m-2'><span className="invert-0.7 text-base pr-2">Title: </span>{record.title}</h1>
-                                                    <h1 className='font-roboto text-ellipsis--2 m-2'><span className="invert-0.7 text-base pr-2">Desc: </span>{record.description}</h1>
-                                                </div>
-                                            )
-                                        })
-                                    )}
-                                </div>
-                                <div className="xl:px-20 mt-2">
-                                    <h1 className='border-b-2 border-b-zinc-900 border-opacity-10 invert-0.5'>PEROSNAL</h1>
-                                </div>
-                                <div className='grid xl:grid-cols-4 xl:gap-x-28 xl:px-20 xl:gap-y-14 xl:pb-32 gap-y-6 lg:grid-cols-3 md:grid-cols-3 md:gap-x-4 pb-20 pt-10 justify-center'>
-                                {ownerRecords.length < 1 ? (
-                                        <div>
-                                            <span className='text-white text-lg md:text-xl lg:text-2xl tracking-wider set-8 font-bold'>Upload to see</span>
-                                        </div>
-                                    ) : (
-                                        ownerRecords.map((record, i) => {
                                             return (
                                                 <div className='lg:h-42 w-64 bg-black rounded-xl text-white p-3 flex flex-col space-y-3 tracking-wide text-lg h-42' key={i}>
                                                     <div className='overflow-hidden rounded-xl cursor-pointer  '>
