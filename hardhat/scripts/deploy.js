@@ -1,7 +1,7 @@
 const hre = require('hardhat');
 const Main = async () => {
   const [deployer] = await hre.ethers.getSigners()
-  const Contract = await hre.ethers.getContractFactory('meddata');
+  const Contract = await hre.ethers.getContractFactory('syncdata');
   const medContract = await Contract.deploy();
   await medContract.deployed();
 
@@ -9,7 +9,7 @@ const Main = async () => {
   console.log("The deployer of the contract is: ", deployer.address);
   console.log("The contract is deployed on this address: ", medContract.address);
 
-  saveFrontendFiles(medContract, "meddata")
+  saveFrontendFiles(medContract, "syncdata")
 
 }
 

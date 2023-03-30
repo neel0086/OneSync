@@ -1,7 +1,7 @@
 //SPDX-License-Identifier:MIT
 pragma solidity ^0.8.19;
 
-contract meddata {
+contract syncdata {
     struct Record {
         uint256 id;
         string title;
@@ -21,25 +21,24 @@ contract meddata {
         uint expiryTime;
     }
 
-    mapping(uint256 => CouponDetails) public coupons;
-    event CouponGenerated(string code, uint256 value, uint256 expiryTime);
-    event CouponRedeemed(string code, address user, uint256 redeemedTime);
-
     uint[] public sellingFileId;
+    Record[] public records;
 
     constructor() payable {}
 
-    Record[] public records;
+    address[] temp = new address[](0);
+    address[] demo = new address[](0);
+    uint256 totalEtherReceived;
 
+    mapping(uint256 => CouponDetails) public coupons;
     mapping(address => uint[]) accessList;
     mapping(address => uint[]) createdBy;
     mapping(address => mapping(uint => bool)) isBought;
     mapping(address => mapping(uint => bool)) isDeposited;
     mapping(uint => address[]) txnDetails;
-    uint256 totalEtherReceived;
 
-    address[] temp = new address[](0);
-    address[] demo = new address[](0);
+    event CouponGenerated(string code, uint256 value, uint256 expiryTime);
+    event CouponRedeemed(string code, address user, uint256 redeemedTime);
 
     function NewRrecord(
         string memory _title,
@@ -83,6 +82,16 @@ contract meddata {
         sellingFileId.push(id);
         records[id].preview = preview;
         records[id].price = price;
+    }
+
+    function getOwnersRecords() public view returns (Record[] memory){  
+        Record[] memory tempRecords = new Record[](
+            createdBy[msg.sender].length
+        );
+        for(uint i=0;i<createdBy[msg.sender].length;i++){
+            tempRecords[i] = records[createdBy[msg.sender][i]];
+        }
+        return tempRecords;
     }
 
     function buyFileId(uint id) public payable {
@@ -234,18 +243,19 @@ contract meddata {
         string memory code,
         uint256 value,
         uint256 expiryTime
-    ) public {
+    ) public returns (string memory) {
         // require(coupons[id].expiryTime == 0, "Coupon code already exists");
-        expiryTime=block.timestamp + 3600;
+        expiryTime = block.timestamp + 3600;
+        
         coupons[id] = CouponDetails(code, value, expiryTime);
         emit CouponGenerated(code, value, expiryTime);
+        return code;
     }
-
     function redeemCoupon(uint256 id, string memory code) public {
-        require(
-            coupons[id].expiryTime < block.timestamp,
-            "Coupon code has expired"
-        );
+        // require(
+        //     coupons[id].expiryTime < block.timestamp,
+        //     "Coupon code has expired"
+        // );
         if (coupons[id].expiryTime > block.timestamp) {
             isBought[msg.sender][id] = true;
             records[id].accessibleBy.push(msg.sender);
