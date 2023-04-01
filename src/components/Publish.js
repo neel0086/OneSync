@@ -10,6 +10,8 @@ const Publish = ({ contract }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [filePath, setFilePath] = useState("");
+  const [openTags, setOpenTags] = useState(false);
+  const [tags, setTags] = useState(null)
   const { address, contractAddress, contractABI } = useStateContext();
   const { mutateAsync: upload } = useStorageUpload();
   const navigate = useNavigate();
@@ -35,7 +37,8 @@ const Publish = ({ contract }) => {
         const msgTx = await contract.NewRrecord(
           `${title}`,
           `${description}`,
-          `${imageURI}`
+          `${imageURI}`,
+          `${tags}`
         )
 
         await msgTx.wait();
@@ -66,6 +69,7 @@ const Publish = ({ contract }) => {
           <h1 className='text-2xl text-white tracking-wider font-bold'>Post a new Record</h1>
           <div className=' h-[0.125rem] bg-slate-600 my-2'></div>
           <form action="" className='flex flex-col justify-center' onSubmit={uploadData}>
+
             <div className='mb-4'>
               <label className='text-white ml-3'>Title</label>
               <input
@@ -79,15 +83,31 @@ const Publish = ({ contract }) => {
                 onChange={e => setDescription(e.target.value)}
                 type="text" required name='desc' rows="4" placeholder='Enter description of record' className='w-full p-2 rounded-lg mt-2 outline-none text-lg' />
             </div>
+            <div className='mb-4'>
+              <label className='text-white ml-3'>Select a tag</label>
+              <br></br>
+              <button onClick={() => { setOpenTags(!openTags) }} class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100  rounded-lg focus:outline-none focus:ring-gray-100 dark:bg-gray-700  dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">
+                {tags ? tags : "Select Tag"}
+                <svg class="w-4 h-4 " aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                  </path>
+                </svg>
+              </button>
+              <div id="dropdownHover" class={`z-10 ${openTags ? "block" : "hidden"} bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700`}>
+                <ul class="py-2 absolute text-sm text-gray-700 bg-white dark:text-gray-200 bg-white divide-y divide-gray-100 rounded-b-lg shadow w-44 dark:bg-gray-700" >
+                  <li onClick={() => setTags("College Material")}>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">COLLEGE MATERIAL</a>
+                  </li>
+                  <li onClick={() => setTags("Book Selling")}>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">BOOK SELLING</a>
+                  </li>
 
+                </ul>
+              </div>
+            </div>
             <div>
               <h1 className='text-white mb-3'>Choose a File</h1>
-              {/* <input type='file'
-                className='font-semibold tracking-wide cursor-pointer text-white'
-                placeholder='Select'
-                onChange={e => setFilePath(e.target.files[0])}
-                required
-              /> */}
+              
             </div>
             <div class="flex items-center justify-center w-full">
               <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">

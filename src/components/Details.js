@@ -17,6 +17,7 @@ const Details = ({ contract, accountAddress }) => {
                 const record = await contract.getOneRecord(parseInt(id.split(':')[1]));
                 console.log('from use effect')
                 console.log(record.price._hex);
+                const accessList = await contract.getAccessList(parseInt(id.split(':')[1]));
                 // // record.newPrice = parseInt(record.price._hex)
                 // console.log({
                 //     id: record.id._hex,
@@ -32,7 +33,7 @@ const Details = ({ contract, accountAddress }) => {
                 // });
                 setRecord({
                     id: record.id._hex,
-                    accessibleBy: record.accessibleBy,
+                    accessibleBy:  accessList,
                     description: record.description,
                     imageURL: record.imageURL,
                     islisted: record.islisted,
@@ -120,6 +121,11 @@ const Details = ({ contract, accountAddress }) => {
         const temp = await contract.sellTheFile(record.id, preview, parseInt(price));
         await temp.wait();
     }
+    const CouponProcess = async(e)=>{
+        var code = await contract.generateCoupon(record.id, "abcdef", 30, 20)
+        await code.wait()
+        console.log(code)
+    }
 
     return (
         <>
@@ -152,7 +158,7 @@ const Details = ({ contract, accountAddress }) => {
 
                                             </div>}
                                         {(accountAddress == record.owner) &&
-                                            <a onClick={(e) => { contract.generateCoupon(record.id, "abcde", 30, 20) }} href="#_" class="relative inline-flex items-center justify-center px-10 py-4 overflow-hidden font-mono font-medium tracking-tighter text-white bg-gray-800 rounded-lg group">
+                                            <a onClick={(e) => { CouponProcess(e) }} href="#_" class="relative inline-flex items-center justify-center px-10 py-4 overflow-hidden font-mono font-medium tracking-tighter text-white bg-gray-800 rounded-lg group">
                                                 <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-zinc-900 rounded-full group-hover:w-56 group-hover:h-56"></span>
                                                 <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
                                                 <span class="relative">Genrate Code</span>

@@ -8,8 +8,8 @@ import { configureChains, createClient, useAccount, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { useContext, createContext } from 'react';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
-import abi from '../contractsData/meddata.json';
-import contractAddress from '../contractsData/meddata-address.json'
+import abi from '../contractsData/syncdata.json';
+import contractAddress from '../contractsData/syncdata-address.json'
 
 
 

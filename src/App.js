@@ -10,8 +10,8 @@ import Footer from './components/Footer';
 import Loading from './components/Loading';
 import { ThirdwebProvider } from "@thirdweb-dev/react";
 import { ethers } from 'ethers';
-import contractAddress from './contractsData/meddata-address.json'
-import abi from './contractsData/meddata.json';
+import contractAddress from './contractsData/syncdata-address.json'
+import abi from './contractsData/syncdata.json';
 import Shop from './components/Shop';
 
 const reload = () => {
@@ -46,6 +46,20 @@ const App = () => {
         console.log(address);
         console.log(contractAddress)
         const contract = new ethers.Contract(contractAddress.address, abi.abi, signer);
+        try {
+          const data = await contract.getUserName();
+          console.log(data);
+        } catch (error) {
+          console.log(error);
+          if (error.data.message.includes("please give user name")) {
+            const name = window.prompt("please give your user name");
+            console.log(name);
+            const temp = await contract.storeUserName(name);
+            await temp.wait();
+            const data = await contract.getUserName();
+            console.log(data);
+          }
+        }
         setContract(contract);
         setProvider(provider);
         console.log(contract)
@@ -63,7 +77,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className='overflow-hidden bg-gradient-to-tr from-neutral-700 via-gray-800 to-neutral-900'>
+    <div className='App overflow-hidden bg-gradient-to-tr from-neutral-700 via-gray-800 to-neutral-900'>
       <StateContextProvider>
         <Navbar />
         <ThirdwebProvider>

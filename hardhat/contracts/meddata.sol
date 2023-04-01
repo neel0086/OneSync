@@ -1,7 +1,7 @@
 //SPDX-License-Identifier:MIT
 pragma solidity ^0.8.19;
 
-contract meddata {
+contract syncdata {
     struct Record {
         uint256 id;
         string title;
@@ -21,25 +21,27 @@ contract meddata {
         uint expiryTime;
     }
 
-    mapping(uint256 => CouponDetails) public coupons;
-    event CouponGenerated(string code, uint256 value, uint256 expiryTime);
-    event CouponRedeemed(string code, address user, uint256 redeemedTime);
-
     uint[] public sellingFileId;
+    Record[] public records;
 
     constructor() payable {}
 
-    Record[] public records;
+    address[] temp = new address[](0);
+    string[] temp1 = new string[](0);
+    address[] demo = new address[](0);
+    uint256 totalEtherReceived;
 
+    mapping(uint256 => CouponDetails) public coupons;
     mapping(address => uint[]) accessList;
     mapping(address => uint[]) createdBy;
     mapping(address => mapping(uint => bool)) isBought;
     mapping(address => mapping(uint => bool)) isDeposited;
     mapping(uint => address[]) txnDetails;
-    uint256 totalEtherReceived;
+    mapping(address => string) addressToUserNameMapping;
+    mapping(string => address) userNameToAddressMapping;
 
-    address[] temp = new address[](0);
-    address[] demo = new address[](0);
+    event CouponGenerated(string code, uint256 value, uint256 expiryTime);
+    event CouponRedeemed(string code, address user, uint256 redeemedTime);
 
     function NewRrecord(
         string memory _title,
@@ -83,6 +85,16 @@ contract meddata {
         sellingFileId.push(id);
         records[id].preview = preview;
         records[id].price = price;
+    }
+
+    function getOwnersRecords() public view returns (Record[] memory) {
+        Record[] memory tempRecords = new Record[](
+            createdBy[msg.sender].length
+        );
+        for (uint i = 0; i < createdBy[msg.sender].length; i++) {
+            tempRecords[i] = records[createdBy[msg.sender][i]];
+        }
+        return tempRecords;
     }
 
     function buyFileId(uint id) public payable {
@@ -164,11 +176,16 @@ contract meddata {
         return tempRecord;
     }
 
-    function newOwner(address _newOwner, uint id) external {
+    function newOwner(string memory _newOwnerUserName, uint id) external {
         require(id < records.length, "give file id is invalid");
         require(
             msg.sender == records[id].owner,
             "you are not owner of this file"
+        );
+        address _newOwner = userNameToAddressMapping[_newOwnerUserName];
+        require(
+            _newOwner != address(0),
+            "given user name is not exists at all"
         );
         require(
             _newOwner != records[id].owner,
@@ -187,16 +204,25 @@ contract meddata {
         records[id].accessibleBy.push(_newOwner);
     }
 
+    function helper(string memory temp) public view returns (address) {
+        return userNameToAddressMapping(temp);
+    }
+
     function getAccessList(uint id) public view returns (address[] memory) {
         require(id < records.length, "give file id is invalid");
         return records[id].accessibleBy;
     }
 
-    function removeOwner(address _removeOwner, uint id) external {
+    function removeOwner(string memory _removeOwnerUserName, uint id) external {
         require(id < records.length, "give file id is invalid");
         require(
             msg.sender == records[id].owner,
             "you are not owner of this file"
+        );
+        address _removeOwner = userNameToAddressMapping[_removeOwnerUserName];
+        require(
+            _removeOwner != address(0),
+            "given user name is not exists at all"
         );
         require(
             _removeOwner != msg.sender,
@@ -229,23 +255,37 @@ contract meddata {
         require(false, "you doesn't give access to this address at all!!");
     }
 
+    function getUserName() public view returns (string memory) {
+        bytes storage stringBytes = bytes(addressToUserNameMapping[msg.sender]);
+        require(stringBytes.length != 0, "please give user name");
+        return addressToUserNameMapping[msg.sender];
+    }
+
+    function storeUserName(string memory userName) public {
+        bytes storage stringBytes = bytes(addressToUserNameMapping[msg.sender]);
+        require(stringBytes.length == 0, "you already have an user name");
+        addressToUserNameMapping[msg.sender] = userName;
+    }
+
     function generateCoupon(
         uint256 id,
         string memory code,
         uint256 value,
         uint256 expiryTime
-    ) public {
+    ) public returns (string memory) {
         // require(coupons[id].expiryTime == 0, "Coupon code already exists");
-        expiryTime=block.timestamp + 3600;
+        expiryTime = block.timestamp + 3600;
+
         coupons[id] = CouponDetails(code, value, expiryTime);
         emit CouponGenerated(code, value, expiryTime);
+        return code;
     }
 
     function redeemCoupon(uint256 id, string memory code) public {
-        require(
-            coupons[id].expiryTime < block.timestamp,
-            "Coupon code has expired"
-        );
+        // require(
+        //     coupons[id].expiryTime < block.timestamp,
+        //     "Coupon code has expired"
+        // );
         if (coupons[id].expiryTime > block.timestamp) {
             isBought[msg.sender][id] = true;
             records[id].accessibleBy.push(msg.sender);
