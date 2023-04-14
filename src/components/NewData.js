@@ -52,11 +52,16 @@ const NewRecords = ({ contract }) => {
             setIsLoading(false);
         }
         const getOwnerRecords = async () => {
-            const records = await contract.getAllRecords();
+            const records = await contract.getOwnersRecords();
             SetOwnerRecords(records)
+        };
+        const getOneRecords = async () => {
+            const records = await contract.getOneRecords();
+            // SetOwnerRecords(records  )
         };
         contract && getAllRecords();
         contract && getOwnerRecords();
+        contract && getOneRecords();
 
     }, [contract])
 

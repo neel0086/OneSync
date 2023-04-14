@@ -35,8 +35,6 @@ contract syncdata {
     mapping(address => uint[]) accessList;
     mapping(address => uint[]) createdBy;
     mapping(address => mapping(uint => bool)) isBought;
-    mapping(address => mapping(uint => bool)) isDeposited;
-    mapping(uint => address[]) txnDetails;
     mapping(address => string) addressToUserNameMapping;
     mapping(string => address) userNameToAddressMapping;
 
@@ -70,15 +68,6 @@ contract syncdata {
     }
 
     function sellTheFile(uint id, string memory preview, uint price) external {
-        require(id < records.length, "give file id is invalid");
-        require(
-            records[id].owner == msg.sender,
-            "you are not owner of this file"
-        );
-        require(
-            records[id].price == 0,
-            "you are already added this file to sell"
-        );
         isBought[msg.sender][id] = true; // owner already own this file SO we can say he already bought this file and it is neccecary so don't remove it
 
         // records[id].accessibleBy.pop(); // now owner does not have contro of this file [MEANS:-any one can buy this image and see it owner can't restrict them]
@@ -98,7 +87,6 @@ contract syncdata {
     }
 
     function buyFileId(uint id) public payable {
-        require(id < records.length, "give file id is invalid");
         for (uint i = 0; i < sellingFileId.length; i++) {
             if (id == sellingFileId[i]) {
                 if (isBought[msg.sender][id]) {
@@ -172,25 +160,11 @@ contract syncdata {
         }
         if (false == isAccessible && 0 != tempRecord.price)
             isAccessible = isBought[msg.sender][_id];
-        require(isAccessible, "you don't have access to this file");
         return tempRecord;
     }
 
     function newOwner(string memory _newOwnerUserName, uint id) external {
-        require(id < records.length, "give file id is invalid");
-        require(
-            msg.sender == records[id].owner,
-            "you are not owner of this file"
-        );
         address _newOwner = userNameToAddressMapping[_newOwnerUserName];
-        require(
-            _newOwner != address(0),
-            "given user name is not exists at all"
-        );
-        require(
-            _newOwner != records[id].owner,
-            "as owner of this file you alread have a access"
-        );
 
         for (uint i = 0; i < accessList[_newOwner].length; i++) {
             if (id == accessList[_newOwner][i]) {
@@ -204,30 +178,12 @@ contract syncdata {
         records[id].accessibleBy.push(_newOwner);
     }
 
-    function helper(string memory temp) public view returns (address) {
-        return userNameToAddressMapping(temp);
-    }
-
     function getAccessList(uint id) public view returns (address[] memory) {
-        require(id < records.length, "give file id is invalid");
         return records[id].accessibleBy;
     }
 
     function removeOwner(string memory _removeOwnerUserName, uint id) external {
-        require(id < records.length, "give file id is invalid");
-        require(
-            msg.sender == records[id].owner,
-            "you are not owner of this file"
-        );
         address _removeOwner = userNameToAddressMapping[_removeOwnerUserName];
-        require(
-            _removeOwner != address(0),
-            "given user name is not exists at all"
-        );
-        require(
-            _removeOwner != msg.sender,
-            "as owner of the file and you can't remove your self from access to this file"
-        );
 
         uint length = accessList[_removeOwner].length;
         for (uint i = 0; i < accessList[_removeOwner].length; i++) {
@@ -256,14 +212,12 @@ contract syncdata {
     }
 
     function getUserName() public view returns (string memory) {
-        bytes storage stringBytes = bytes(addressToUserNameMapping[msg.sender]);
-        require(stringBytes.length != 0, "please give user name");
+        // bytes storage stringBytes = bytes(addressToUserNameMapping[msg.sender]);
         return addressToUserNameMapping[msg.sender];
     }
 
     function storeUserName(string memory userName) public {
-        bytes storage stringBytes = bytes(addressToUserNameMapping[msg.sender]);
-        require(stringBytes.length == 0, "you already have an user name");
+        // bytes storage stringBytes = bytes(addressToUserNameMapping[msg.sender]);
         addressToUserNameMapping[msg.sender] = userName;
     }
 
