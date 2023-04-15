@@ -61,7 +61,7 @@ const NewRecords = ({ contract }) => {
         };
         contract && getAllRecords();
         contract && getOwnerRecords();
-        contract && getOneRecords();
+        // contract && getOneRecords();
 
     }, [contract])
 

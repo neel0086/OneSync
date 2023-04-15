@@ -147,21 +147,21 @@ contract syncdata {
         return tempRecords;
     }
 
-    function getOneRecord(uint256 _id) public view returns (Record memory) {
-        require(_id < records.length, "given file id is not exists");
-        Record memory tempRecord = records[_id]; // will it going to create copy or referecnce
+    // function getOneRecord(uint256 _id) public view returns (Record memory) {
+    //     require(_id < records.length, "given file id is not exists");
+    //     Record memory tempRecord = records[_id]; // will it going to create copy or referecnce
 
-        bool isAccessible = false;
+    //     bool isAccessible = false;
 
-        for (uint i = 0; i < records[_id].accessibleBy.length; i++) {
-            if (records[_id].accessibleBy[i] == msg.sender) {
-                isAccessible = true;
-            }
-        }
-        if (false == isAccessible && 0 != tempRecord.price)
-            isAccessible = isBought[msg.sender][_id];
-        return tempRecord;
-    }
+    //     for (uint i = 0; i < records[_id].accessibleBy.length; i++) {
+    //         if (records[_id].accessibleBy[i] == msg.sender) {
+    //             isAccessible = true;
+    //         }
+    //     }
+    //     if (false == isAccessible && 0 != tempRecord.price)
+    //         isAccessible = isBought[msg.sender][_id];
+    //     return tempRecord;
+    // }
 
     function newOwner(string memory _newOwnerUserName, uint id) external {
         address _newOwner = userNameToAddressMapping[_newOwnerUserName];
