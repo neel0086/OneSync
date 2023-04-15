@@ -93,8 +93,6 @@ const App = () => {
         <Footer />
       </StateContextProvider>
     </div>
-
-
   )
 }
 

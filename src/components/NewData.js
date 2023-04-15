@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 
 const NewRecords = ({ contract }) => {
     const [recordsArray, setRecordsArray] = useState([]);
-    const [ownerRecords,SetOwnerRecords] = useState([]);
+    const [ownerRecords, SetOwnerRecords] = useState([]);
     const recordArrayHelper = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
     const [paidOrFree, setPaidOrFree] = useState(false)
@@ -61,7 +61,7 @@ const NewRecords = ({ contract }) => {
         };
         contract && getAllRecords();
         contract && getOwnerRecords();
-        contract && getOneRecords();
+        // contract && getOneRecords();
 
     }, [contract])
 
@@ -118,8 +118,8 @@ const NewRecords = ({ contract }) => {
 
                                         </button>
 
-                                        <div id="dropdown" style={{display:`${paidOrFree?"block":'none'}`}} >
-                                            <ul onClick={(e) => {setSubscription(e.target.value);setPaidOrFree(false)}}  class="py-2 absolute text-sm text-gray-700 bg-white dark:text-gray-200 bg-white divide-y divide-gray-100 rounded-b-lg shadow w-44 dark:bg-gray-700" aria-labelledby="dropdown-button">
+                                        <div id="dropdown" style={{ display: `${paidOrFree ? "block" : 'none'}` }} >
+                                            <ul onClick={(e) => { setSubscription(e.target.value); setPaidOrFree(false) }} class="py-2 absolute text-sm text-gray-700 bg-white dark:text-gray-200 bg-white divide-y divide-gray-100 rounded-b-lg shadow w-44 dark:bg-gray-700" aria-labelledby="dropdown-button">
                                                 <li>
                                                     <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" value="free">free</button>
                                                 </li>
@@ -168,7 +168,7 @@ const NewRecords = ({ contract }) => {
                                     <h1 className='border-b-2 border-b-zinc-900 border-opacity-10 invert-0.5'>PEROSNAL</h1>
                                 </div>
                                 <div className='grid xl:grid-cols-4 xl:gap-x-28 xl:px-20 xl:gap-y-14 xl:pb-32 gap-y-6 lg:grid-cols-3 md:grid-cols-3 md:gap-x-4 pb-20 pt-10 justify-center'>
-                                {ownerRecords.length < 1 ? (
+                                    {ownerRecords.length < 1 ? (
                                         <div>
                                             <span className='text-white text-lg md:text-xl lg:text-2xl tracking-wider set-8 font-bold'>Upload to see</span>
                                         </div>
