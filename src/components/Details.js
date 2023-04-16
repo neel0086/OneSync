@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 const Details = ({ contract, accountAddress }) => {
     const { id } = useParams();
-    console.log(id);
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [newAddress, setNewAddress] = useState();
@@ -12,28 +11,13 @@ const Details = ({ contract, accountAddress }) => {
     useEffect(() => {
         const fetchRecord = async () => {
             setIsLoading(true);
-            console.log('function is called')
             try {
                 const record = await contract.getOneRecord(parseInt(id.split(':')[1]));
-                console.log('from use effect')
-                console.log(record.price._hex);
                 const accessList = await contract.getAccessList(parseInt(id.split(':')[1]));
-                // // record.newPrice = parseInt(record.price._hex)
-                // console.log({
-                //     id: record.id._hex,
-                //     accessibleBy: record.accessibleBy,
-                //     description: record.description,
-                //     imageURL: record.imageURL,
-                //     islisted: record.islisted,
-                //     notifaction: record.notifaction,
-                //     owner: record.owner,
-                //     preview: record.preview,
-                //     price: parseInt(record.price._hex),
-                //     title: record.title
-                // });
+
                 setRecord({
                     id: record.id._hex,
-                    accessibleBy:  accessList,
+                    accessibleBy: accessList,
                     description: record.description,
                     imageURL: record.imageURL,
                     islisted: record.islisted,
@@ -44,12 +28,7 @@ const Details = ({ contract, accountAddress }) => {
                     title: record.title
                 });
             } catch (error) {
-                console.log(error)
-                // if (error.data.message.includes("you don't have access to this file")) {
-                //     alert("you don't have access to this file");
-                // } else if (error.data.message.includes("given file id is not exists")) {
-                //     alert("given file id is not exists");
-                // }
+
                 navigate('/records');
             }
             setIsLoading(false);
@@ -62,15 +41,11 @@ const Details = ({ contract, accountAddress }) => {
         try {
             if (window.ethereum) {
                 const newTx = await contract.newOwner(newAddress, parseInt(id.split(':')[1]));
-                console.log(newTx);
                 const temp = await newTx.wait();
                 const accessList = await contract.getAccessList(parseInt(id.split(':')[1]));
-                console.log(temp)
                 setRecord(prevState => ({ ...prevState, accessibleBy: accessList }));
                 alert("You successfully give the access of the records to this adress: ", newAddress)
-                console.log(await contract.getOneRecord(record.id))
             } else {
-                console.log('eth object not found')
             }
         } catch (error) {
             if (error.data.message.includes("given file id is not exists")) {
@@ -86,20 +61,15 @@ const Details = ({ contract, accountAddress }) => {
 
     const setRemoveOwner = async () => {
         setIsLoading(true);
-        console.log('here')
         try {
             if (window.ethereum) {
 
-                console.log(newAddress)
                 const removeTx = await contract.removeOwner(newAddress, parseInt(id.split(':')[1]));
                 await removeTx.wait();
                 const accessList = await contract.getAccessList(parseInt(id.split(':')[1]));
                 setRecord(prevState => ({ ...prevState, accessibleBy: accessList }));
-                console.log(removeTx)
                 alert("Successfully removed owner with address: " + newAddress);
-            } else {
-                console.log('eth object not found');
-            }
+            } 
         } catch (error) {
             if (error.data.message.includes("given file id is not exists")) {
                 alert("given file id is not exists");
@@ -116,15 +86,15 @@ const Details = ({ contract, accountAddress }) => {
         event.preventDefault();
         const price = window.prompt('give price value');
         const preview = window.prompt('give preview information');
-        console.log(price);
-        console.log(preview);
         const temp = await contract.sellTheFile(record.id, preview, parseInt(price));
         await temp.wait();
     }
-    const CouponProcess = async(e)=>{
-        var code = await contract.generateCoupon(record.id, "abcdef", 30, 20)
+    const CouponProcess = async (e) => {
+        const currentTime = Date.now().toString();
+        const couponCode = Math.floor(Math.random() * 1001).toString() + currentTime;
+        var code = await contract.generateCoupon(record.id, couponCode, 30, 20)
+        alert("Please copy this coupon code it will be valid for only 1hour\n"+ couponCode)
         await code.wait()
-        console.log(code)
     }
 
     return (
@@ -147,25 +117,26 @@ const Details = ({ contract, accountAddress }) => {
 
                                     <hr />
                                     <p className='text-justify text-lg mt-6 tracking-wider font-light'> {record.description}</p>
-                                    <p className='text-justify text-lg mt-6 tracking-wider font-light'>
+                                    <div className='text-justify flex justify-between lg:flex-row md:flex-col text-lg mt-6 tracking-wider font-light'>
                                         {((accountAddress == record.owner) && (0 == record.price)) &&
-                                            <div>
-                                                <a onClick={sellHelper} href="#_" class="relative inline-flex items-center justify-center px-10 py-4 overflow-hidden font-mono font-medium tracking-tighter text-white bg-gray-800 rounded-lg group">
-                                                    <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-zinc-900 rounded-full group-hover:w-56 group-hover:h-56"></span>
-                                                    <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
-                                                    <span class="relative">Sell This Image</span>
+                                            <div className='mr-2 mb-2'>
+                                                <a onClick={sellHelper} href="#_" className="relative inline-flex items-center justify-center px-10 py-4 overflow-hidden font-mono font-medium tracking-tighter text-white bg-gray-800 rounded-lg group">
+                                                    <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-zinc-900 rounded-full group-hover:w-56 group-hover:h-56"></span>
+                                                    <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
+                                                    <span className="relative">Sell This Image</span>
                                                 </a>
 
                                             </div>}
                                         {(accountAddress == record.owner) &&
-                                            <a onClick={(e) => { CouponProcess(e) }} href="#_" class="relative inline-flex items-center justify-center px-10 py-4 overflow-hidden font-mono font-medium tracking-tighter text-white bg-gray-800 rounded-lg group">
-                                                <span class="absolute w-0 h-0 transition-all duration-500 ease-out bg-zinc-900 rounded-full group-hover:w-56 group-hover:h-56"></span>
-                                                <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
-                                                <span class="relative">Genrate Code</span>
-                                            </a>
-
+                                            <div>
+                                                <a onClick={(e) => { CouponProcess(e) }} href="#_" className="relative inline-flex items-center justify-center px-10 py-4 overflow-hidden font-mono font-medium tracking-tighter text-white bg-gray-800 rounded-lg group">
+                                                    <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-zinc-900 rounded-full group-hover:w-56 group-hover:h-56"></span>
+                                                    <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
+                                                    <span className="relative">Genrate Code</span>
+                                                </a>
+                                            </div>
                                         }
-                                    </p>
+                                    </div>
                                     {/* <button onClick={sellHelper}>sell this imgae</button> */}
                                     {/* <p className='text-justify mt-6 tracking-wider text-lg'>Recordtime: {data.timestamp}</p> */}
                                 </div>

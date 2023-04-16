@@ -6,8 +6,8 @@ const Main = async () => {
   await medContract.deployed();
 
 
-  console.log("The deployer of the contract is: ", deployer.address);
-  console.log("The contract is deployed on this address: ", medContract.address);
+  // console.log("The deployer of the contract is: ", deployer.address);
+  // console.log("The contract is deployed on this address: ", medContract.address);
 
   saveFrontendFiles(medContract, "syncdata")
 

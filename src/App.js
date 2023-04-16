@@ -43,31 +43,21 @@ const App = () => {
         const signer = provider.getSigner();
         const address = await signer.getAddress();
         setAccount(address);
-        console.log(address);
-        console.log(contractAddress)
         const contract = new ethers.Contract(contractAddress.address, abi.abi, signer);
         try {
           const data = await contract.getUserName();
-          console.log(data);
         } catch (error) {
-          console.log(error);
           if (error.data.message.includes("please give user name")) {
             const name = window.prompt("please give your user name");
-            console.log(name);
             const temp = await contract.storeUserName(name);
             await temp.wait();
             const data = await contract.getUserName();
-            console.log(data);
           }
         }
         setContract(contract);
         setProvider(provider);
-        console.log(contract)
-      } else {
-        console.log("please provide support of metamask");
-      }
+      } 
     }
-    console.log(provider)
     provider && loadProvider(); // i have doubt over here IT SHOULD NOT BE LIKE THIS => loadProvider();
     //  what if metamask is not installed in browser
     return () => {
