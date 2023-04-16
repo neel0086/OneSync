@@ -82,7 +82,7 @@ const Publish = ({ contract }) => {
                 onChange={e => setDescription(e.target.value)}
                 type="text" required name='desc' rows="4" placeholder='Enter description of record' className='w-full p-2 rounded-lg mt-2 outline-none text-lg' />
             </div>
-            <div className='mb-4'>
+            {/* <div className='mb-4'>
               <label className='text-white ml-3'>Select a tag</label>
               <br></br>
               <button onClick={() => { setOpenTags(!openTags) }} class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100  rounded-lg focus:outline-none focus:ring-gray-100 dark:bg-gray-700  dark:focus:ring-gray-700 dark:text-white dark:border-gray-600" type="button">
@@ -103,7 +103,7 @@ const Publish = ({ contract }) => {
 
                 </ul>
               </div>
-            </div>
+            </div> */}
             <div>
               <h1 className='text-white mb-3'>Choose a File</h1>
 
