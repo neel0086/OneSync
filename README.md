@@ -13,7 +13,7 @@ In addition to its file sharing and storage features, OneSync also provides a ma
 - [React.js](https://reactjs.org/) (Frontend Framework)
 - [IPFS](https:ipfs://ipfs.tech/)(To store the files on peer to peer network)
 - [Thirdweb](https://thirdweb.com/)(To use to upload the images to ipfs)
-- [Sepolia](https://shardeum.org/)(The smartcontract is deployed on the sepolia testnet)
+- Sepolia (The smartcontract is deployed on the sepolia testnet)
 - [Rainbowkit/wagmi](https://www.rainbowkit.com/)(
   Out-of-the-box wallet management for your dapp)
 
